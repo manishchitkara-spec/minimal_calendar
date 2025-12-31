@@ -38,6 +38,15 @@
             margin-bottom: 50px;
         }
 
+        .section.hidden {
+            display: none;
+        }
+
+        .container {
+            cursor: pointer;
+            user-select: none;
+        }
+
         .section-header {
             display: flex;
             justify-content: space-between;
@@ -113,10 +122,10 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Overview</h1>
+    <div class="container" id="container">
+        <h1 id="page-title">Month</h1>
 
-        <div class="section">
+        <div class="section" id="year-section">
             <div class="section-header">
                 <div class="section-title">Year</div>
                 <div class="percentage" id="year-percent">0%</div>
@@ -124,7 +133,7 @@
             <div class="dots-container" id="year-dots"></div>
         </div>
 
-        <div class="section">
+        <div class="section" id="month-section">
             <div class="section-header">
                 <div class="section-title">Month</div>
                 <div class="percentage" id="month-percent">0%</div>
@@ -132,7 +141,7 @@
             <div class="dots-container" id="month-dots"></div>
         </div>
 
-        <div class="section">
+        <div class="section" id="day-section">
             <div class="section-header">
                 <div class="section-title">Day</div>
                 <div class="percentage" id="day-percent">0%</div>
@@ -140,7 +149,7 @@
             <div class="dots-container" id="day-dots"></div>
         </div>
 
-        <div class="section">
+        <div class="section" id="hour-section">
             <div class="section-header">
                 <div class="section-title">Hour</div>
                 <div class="percentage" id="hour-percent">0%</div>
@@ -150,6 +159,39 @@
     </div>
 
     <script>
+        let currentView = 0; // 0: Month, 1: Year, 2: Day, 3: Hour, 4: Overview
+        const views = [
+            { title: 'Month', show: ['month-section'] },
+            { title: 'Year', show: ['year-section'] },
+            { title: 'Day', show: ['day-section'] },
+            { title: 'Hour', show: ['hour-section'] },
+            { title: 'Overview', show: ['year-section', 'month-section', 'day-section', 'hour-section'] }
+        ];
+
+        function updateView() {
+            const view = views[currentView];
+            const allSections = ['year-section', 'month-section', 'day-section', 'hour-section'];
+            
+            // Update title
+            document.getElementById('page-title').textContent = view.title;
+            
+            // Hide all sections
+            allSections.forEach(sectionId => {
+                document.getElementById(sectionId).classList.add('hidden');
+            });
+            
+            // Show only the sections for current view
+            view.show.forEach(sectionId => {
+                document.getElementById(sectionId).classList.remove('hidden');
+            });
+        }
+
+        // Click to cycle through views
+        document.getElementById('container').addEventListener('click', function() {
+            currentView = (currentView + 1) % views.length;
+            updateView();
+        });
+
         function createDots(containerId, total, current, percentId) {
             const container = document.getElementById(containerId);
             container.innerHTML = '';
@@ -216,8 +258,11 @@
             return Math.floor(diff / oneDay);
         }
 
-        // Update immediately and then every minute
+        // Initialize
         updateProgress();
+        updateView();
+        
+        // Update progress every minute
         setInterval(updateProgress, 60000);
     </script>
 </body>
